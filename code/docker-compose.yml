@@ -1,0 +1,37 @@
+version: '2'
+services:
+    redis:
+        image: "redis:alpine"
+
+    rabbit:
+        hostname: rabbit
+        image: rabbitmq:latest
+        environment:
+            - RABBITMQ_DEFAULT_USER=admin
+            - RABBITMQ_DEFAULT_PASS=mypass
+        ports:
+            - "5673:5672"
+
+    job_queuing_manager:
+        build:
+            context: .
+            dockerfile: Dockerfile_JQM
+        volumes:
+            - .:/jqm
+        links:
+            - rabbit
+            - redis
+        depends_on:
+            - rabbit
+            - redis
+
+    job_feeder:
+        build:
+            context: .
+            dockerfile: Dockerfile_JF
+        volumes:
+            - .:/jf
+        links:
+            - job_queuing_manager
+        depends_on:
+            - job_queuing_manager

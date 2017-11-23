@@ -1,0 +1,10 @@
+FROM python:3
+
+ADD requirements.txt /job_feeder/requirements.txt
+ADD job_operations.py /job_feeder/job_operations.py
+ADD job_queuing_worker.py /job_feeder/job_queuing_worker.py
+ADD job_feeder.py /job_feeder/job_feeder.py
+WORKDIR /job_feeder/
+RUN pip install -r requirements.txt
+RUN pip install -U "celery[redis]"
+ENTRYPOINT python3 job_feeder.py 150
