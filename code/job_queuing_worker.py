@@ -11,8 +11,10 @@ job_queue_name 			= 'job_queue'
 
 def init():
 	job_app = Celery('job_app',
-		broker	= 	'pyamqp://admin:mypass@' + 'rabbit' + '//',
-		backend	=	'redis://' + 'redis' + ':6379/1',
+		broker	= 	'pyamqp://guest@' + '127.0.0.1' + '//',
+		backend	=	'redis://' + '127.0.0.1' + ':6379/1',
+		#broker	= 	'pyamqp://admin:mypass@' + 'rabbit' + '//',
+		#backend	=	'redis://' + 'redis' + ':6379/1',
 		include =   ['job_operations'])
 
 	job_app.conf.update(
@@ -33,8 +35,9 @@ def init():
 
 job_app = init()
 
-def start():
-	print("I'm starting the Job Worker")
+#def start(container):
+if __name__ == '__main__':
+	print(" ----------- I'm starting the Job Worker for the container " )
 	job_app = init()
 	job_worker = worker.worker(app=job_app)
 	job_options = {
@@ -44,5 +47,9 @@ def start():
 		'traceback': True,
 
 	}
-	job_worker.run(**job_options)
+	argv = [
+        'worker','-A','job_queuing_worker',
+        '--loglevel=info']
+	#job_worker.run(**job_options)
 	#job_app.start()
+	job_app.worker_main(argv)

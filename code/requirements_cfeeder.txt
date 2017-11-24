@@ -1,0 +1,4 @@
+celery
+celery[redis]
+redis
+docker

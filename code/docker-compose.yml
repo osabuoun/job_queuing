@@ -12,12 +12,12 @@ services:
         ports:
             - "5673:5672"
 
-    job_queuing_manager:
+    queuing_manager:
         build:
             context: .
-            dockerfile: Dockerfile_JQM
+            dockerfile: Dockerfile_QM
         volumes:
-            - .:/jqm
+            - .:/qmanager
         links:
             - rabbit
             - redis
@@ -25,13 +25,27 @@ services:
             - rabbit
             - redis
 
+    container_feeder:
+        build:
+            context: .
+            dockerfile: Dockerfile_CFeeder
+        volumes:
+            - .:/cfeeder
+            - /usr/bin/docker:/usr/bin/docker
+            - /var/run/docker.sock:/var/run/docker.sock
+        links:
+            - queuing_manager
+        depends_on:
+            - queuing_manager
+
     job_feeder:
         build:
             context: .
-            dockerfile: Dockerfile_JF
+            dockerfile: Dockerfile_JFeeder
         volumes:
-            - .:/jf
+            - .:/jfeeder
         links:
-            - job_queuing_manager
+            - queuing_manager
         depends_on:
-            - job_queuing_manager
+            - queuing_manager
+            - container_feeder
