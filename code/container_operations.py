@@ -25,19 +25,3 @@ def add(container):
 	job_worker_thread.start()
 	job_workers.append(job_worker_thread)
 	print("**************Back from worker ************")
-
-@container_app.task
-def add_old(task, x, y):
-	container_app.control.cancel_consumer('add_queue', reply=True)
-	print("New Container Add - Task: " + task + " - " + str(x) + " - " + str(y))
-	time.sleep(1)
-	job_queuing_worker.start()
-	print("New Container Result - after " + task + " - " + str(x) + " - " + str(y))
-
-
-	container_app.control.add_consumer(
-		queue='add_queue',
-		reply=True,
-	)
-	return x + y
-
