@@ -3,17 +3,14 @@ from celery import Celery
 from celery.bin import worker
 import time, sys
 
-sys.path.append('..')
-worker_name = sys.argv[1]
-
 container_queue_name 	= 'container_queue'
 
 def init_container_worker():
 	container_app = Celery('container_app',
-		broker	= 	'pyamqp://guest@' + '127.0.0.1' + '//',
-		backend	=	'redis://' + '127.0.0.1' + ':6379/0',
-		#broker	= 	'pyamqp://admin:mypass@' + 'rabbit' + '//',
-		#backend	=	'redis://' + 'redis' + ':6379/0',
+		#broker	= 	'pyamqp://guest@' + '127.0.0.1' + '//',
+		#backend	=	'redis://' + '127.0.0.1' + ':6379/0',
+		broker	= 	'pyamqp://admin:mypass@' + 'rabbit' + '//',
+		backend	=	'redis://' + 'redis' + ':6379/0',
 		include	=	['container_operations'])
 
 	container_app.conf.update(
@@ -39,7 +36,7 @@ def start_container_worker(worker):
 	container_app = init_container_worker()
 	container_worker = worker.worker(app=container_app)
 	container_options = {
-		'hostname'	: "container_" + worker_name,
+		'hostname'	: "queuing_manager",
 		'queues'	: [container_queue_name],
 		'loglevel': 'INFO',
 		'traceback': True,

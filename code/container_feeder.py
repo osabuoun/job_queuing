@@ -6,7 +6,7 @@ import container_operations
 
 
 task_id = sys.argv[1]
-service_name = 'customer_application'
+service_name = 'customer_app'
 client = docker.from_env()
 index = 1
 
@@ -54,22 +54,15 @@ while True:
 				}
 			try:
 				container_obj['ip_address'] = container.attrs['NetworkSettings']['Networks']['bridge']['IPAddress']
-				pass
+				container_operations.add.delay(container_obj)
+				container_list[container_long_id] = container_obj
+				pprint(container_obj)
 			except Exception as e:
+				print("An error happened while sending the container to the Agent")
 				pass
 		except Exception as e:
 			print("It isn't a swarm service's container")
-			raise e
 
-		try:
-			container_operations.add.delay(container_obj)
-			container_list[container_long_id] = container_obj
-			pprint(container_obj)
-		except Exception as e:
-			#raise e
-			print("An error happened while sending the container to the Agent")
-
-	#pprint(container_list)
 	time.sleep(5)
 
 '''

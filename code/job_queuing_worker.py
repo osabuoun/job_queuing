@@ -3,18 +3,17 @@ from celery import Celery
 from celery.bin import worker
 from threading import Thread
 
-import time
-import sys 
-sys.path.append('..')
-worker_name = sys.argv[1]
-job_queue_name 			= 'job_queue'
+import time, sys, ast
+
+job_queue_name 	= 'job_queue'
+worker_name = "NoName"
 
 def init():
 	job_app = Celery('job_app',
-		broker	= 	'pyamqp://guest@' + '127.0.0.1' + '//',
-		backend	=	'redis://' + '127.0.0.1' + ':6379/1',
-		#broker	= 	'pyamqp://admin:mypass@' + 'rabbit' + '//',
-		#backend	=	'redis://' + 'redis' + ':6379/1',
+		#broker	= 	'pyamqp://guest@' + '127.0.0.1' + '//',
+		#backend	=	'redis://' + '127.0.0.1' + ':6379/1',
+		broker	= 	'pyamqp://admin:mypass@' + 'rabbit' + '//',
+		backend	=	'redis://' + 'redis' + ':6379/1',
 		include =   ['job_operations'])
 
 	job_app.conf.update(
@@ -38,20 +37,21 @@ job_app = init()
 #def start(container):
 if __name__ == '__main__':
 	print(" ----------- I'm starting the Job Worker for the container " )
+	container = ast.literal_eval(sys.argv[1])
+	log_file =  "./log/" + container['hostname'] + ".log"
+	with open(log_file, "a") as myfile:
+		myfile.write("=====================================================\n")		
+		myfile.write(str(container) + "\n")
+		myfile.write("=====================================================\n")
+	worker_name = container['id_long']
+
 	job_app = init()
 	job_worker = worker.worker(app=job_app)
 	job_options = {
-		'hostname'	: "job_" + worker_name ,
+		'hostname'	: worker_name ,
 		'queues'	: [job_queue_name],
 		'loglevel': 'INFO',
 		'traceback': True,
 
 	}
-	'''
-	argv = [
-        'worker','-A','job_queuing_worker',
-        '--loglevel=info']
-	#job_app.start()
-	job_app.worker_main(argv)
-	'''
 	job_worker.run(**job_options)

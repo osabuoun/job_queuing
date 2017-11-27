@@ -11,4 +11,5 @@ RUN export IP=$(hostname -I | cut -d\  -f1)
 RUN sed -i -e "s/-H fd:\/\//-H fd:\/\/ -H tcp:\/\/$IP:2375/g" /lib/systemd/system/docker.service
 RUN service docker start
 ADD my_script.py /
+ADD app.py /
 CMD [ "python", "./my_script.py" ]

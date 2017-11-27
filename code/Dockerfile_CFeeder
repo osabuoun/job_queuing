@@ -2,11 +2,11 @@ FROM python:3
 
 ADD requirements_cfeeder.txt /container_feeder/requirements_cfeeder.txt
 ADD container_operations.py /container_feeder/container_operations.py
-ADD container_queuing_worker.py /container_feeder/container_queuing_worker.py
+ADD queuing_manager.py /container_feeder/queuing_manager.py
 ADD container_feeder.py /container_feeder/container_feeder.py
 ADD job_operations.py /container_feeder/job_operations.py
 ADD job_queuing_worker.py /container_feeder/job_queuing_worker.py
 WORKDIR /container_feeder/
 RUN pip install -r requirements_cfeeder.txt
 RUN pip install -U "celery[redis]"
-ENTRYPOINT python3 container_feeder.py 1
+ENTRYPOINT python3 container_feeder.py customer_app
