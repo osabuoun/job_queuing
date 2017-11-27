@@ -18,6 +18,8 @@ services:
             dockerfile: Dockerfile_QM
         volumes:
             - .:/qmanager
+            - /usr/bin/docker:/usr/bin/docker
+            - /var/run/docker.sock:/var/run/docker.sock
         links:
             - rabbit
             - redis
