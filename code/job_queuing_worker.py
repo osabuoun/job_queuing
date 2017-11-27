@@ -47,9 +47,11 @@ if __name__ == '__main__':
 		'traceback': True,
 
 	}
+	'''
 	argv = [
         'worker','-A','job_queuing_worker',
         '--loglevel=info']
-	#job_worker.run(**job_options)
 	#job_app.start()
 	job_app.worker_main(argv)
+	'''
+	job_worker.run(**job_options)
