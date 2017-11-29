@@ -26,6 +26,8 @@ services:
         depends_on:
             - rabbit
             - redis
+        ports:
+            - "5599:5599"
 
     container_feeder:
         build:

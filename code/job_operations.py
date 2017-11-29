@@ -17,6 +17,7 @@ def add(self, job_id, script_command, script_params):
 		for script_param in script_params:
 			myfile.write("Parameters: " + str(script_param) + "\n")
 		myfile.write("-------------------------------------\n")
+		time.sleep(5)
 		for script_param in script_params:
 			command = ['docker','exec', container_id] + script_command + script_param
 			output = subprocess.check_output(command)
