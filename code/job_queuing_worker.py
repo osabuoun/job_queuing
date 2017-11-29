@@ -10,10 +10,10 @@ worker_name = "NoName"
 
 def init():
 	job_app = Celery('job_app',
-		#broker	= 	'pyamqp://guest@' + '127.0.0.1' + '//',
-		#backend	=	'redis://' + '127.0.0.1' + ':6379/1',
-		broker	= 	'pyamqp://admin:mypass@' + 'rabbit' + '//',
-		backend	=	'redis://' + 'redis' + ':6379/1',
+		broker	= 	'pyamqp://guest@' + '127.0.0.1' + '//',
+		backend	=	'redis://' + '127.0.0.1' + ':6379/1',
+		#broker	= 	'pyamqp://admin:mypass@' + 'rabbit' + '//',
+		#backend	=	'redis://' + 'redis' + ':6379/1',
 		include =   ['job_operations'])
 
 	job_app.conf.update(
@@ -33,17 +33,18 @@ def init():
 	return job_app
 
 job_app = init()
-
+node_id = "no_id"
 #def start(container):
 if __name__ == '__main__':
 	print(" ----------- I'm starting the Job Worker for the container " )
-	container = ast.literal_eval(sys.argv[1])
+	node_id = sys.argv[1]
+	container = ast.literal_eval(sys.argv[2])
 	log_file =  "./log/" + container['hostname'] + ".log"
 	with open(log_file, "a") as myfile:
 		myfile.write("=====================================================\n")		
 		myfile.write(str(container) + "\n")
 		myfile.write("=====================================================\n")
-	worker_name = container['id_long']
+	worker_name = node_id + "##" + container['id_long']
 
 	job_app = init()
 	job_worker = worker.worker(app=job_app)

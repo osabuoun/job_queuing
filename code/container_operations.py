@@ -1,9 +1,11 @@
 from __future__ import absolute_import, unicode_literals
-from queuing_manager import container_app
 from pprint import pprint
 from threading import Thread
 import time, sys
 import shlex, subprocess
+
+from queuing_manager import container_app, node_id
+import monitoring
 
 print("I'm starting the Container Operations")
 
@@ -12,7 +14,9 @@ job_workers = []
 def worker(container):
 	# Arguments you give on command line
 	print("---------------------- worker_main ----------------------")
-	output = subprocess.check_output(['python3','job_queuing_worker.py', str(container)])
+	monitoring.add_worker(node_id)
+	output = subprocess.check_output(['python3','job_queuing_worker.py', str(node_id) ,str(container)])
+	monitoring.terminate_worker(node_id)
 	print(output)
 	print("---------------------- worker_main End ----------------------")
 
