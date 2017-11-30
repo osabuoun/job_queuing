@@ -1,11 +1,12 @@
 FROM python:3
 ADD requirements.txt /app/requirements.txt
-ADD container_feeder.py /app/container_feeder.py
 ADD container_operations.py /app/container_operations.py
+ADD experiment_operations.py /app/experiment_operations.py
 ADD queuing_manager.py /app/queuing_manager.py
+ADD monitoring.py /app/monitoring.py
 ADD job_feeder.py /app/job_feeder.py
 ADD job_operations.py /app/job_operations.py
-ADD job_queuing_worker.py /app/job_queuing_worker.py
+ADD jqueuing_worker.py /app/jqueuing_worker.py
 WORKDIR /app/
 RUN mkdir log
 RUN pip install -r requirements.txt

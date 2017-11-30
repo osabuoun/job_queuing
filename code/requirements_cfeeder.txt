@@ -2,3 +2,5 @@ celery
 celery[redis]
 redis
 docker
+prometheus_client
+datadog

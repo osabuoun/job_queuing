@@ -1,0 +1,11 @@
+FROM python:3
+
+ADD requirements_cfeeder.txt /experiment_feeder/requirements_cfeeder.txt
+ADD experiment_operations.py /experiment_feeder/experiment_operations.py
+ADD queuing_manager.py /experiment_feeder/queuing_manager.py
+ADD experiment_feeder.py /experiment_feeder/experiment_feeder.py
+ADD monitoring.py /experiment_feeder/monitoring.py
+WORKDIR /experiment_feeder/
+RUN pip install -r requirements_cfeeder.txt
+RUN pip install -U "celery[redis]"
+ENTRYPOINT python3 experiment_feeder.py 1 customer_app 1 2 3

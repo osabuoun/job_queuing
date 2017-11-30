@@ -44,12 +44,12 @@ if __name__ == '__main__':
 		myfile.write("=====================================================\n")		
 		myfile.write(str(container) + "\n")
 		myfile.write("=====================================================\n")
-	worker_name = node_id + "##" + container['id_long']
+	worker_id = node_id + "##" + container['service_name'] + "##" + container['id_long']
 
 	job_app = init()
 	job_worker = worker.worker(app=job_app)
 	job_options = {
-		'hostname'	: worker_name ,
+		'hostname'	: worker_id ,
 		'queues'	: [job_queue_name],
 		'loglevel': 'INFO',
 		'traceback': True,
