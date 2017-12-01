@@ -1,6 +1,6 @@
 import sys, time, random
 
-from experiment_manager import add  
+from experiment_operations import add  
 
 if __name__ == '__main__':
 	experiment_id = "exp_" + str(int(round(time.time() * 1000))) + "_" + str(random.randrange(100, 999))

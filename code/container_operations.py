@@ -15,7 +15,7 @@ def worker(container):
 	# Arguments you give on command line
 	print("---------------------- worker_main ----------------------")
 	monitoring.add_worker(node_id, container["service_name"])
-	output = subprocess.check_output(['python3','job_queuing_worker.py', str(node_id) ,str(container)])
+	output = subprocess.check_output(['python3','jqueuing_worker.py', str(node_id) ,str(container)])
 	monitoring.terminate_worker(node_id, service_name)
 	print(output)
 	print("---------------------- worker_main End ----------------------")

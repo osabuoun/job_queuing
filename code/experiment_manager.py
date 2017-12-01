@@ -3,7 +3,7 @@ from celery import Celery
 from celery.bin import worker
 import time, sys
 from threading import Thread
-import container_feeder
+import container_feeder, config.parameters as _params
 experiment_queue 	= 'experiment_queue'
 customer_services = {}
 
@@ -11,11 +11,11 @@ import redis
 redis_db = redis.StrictRedis(host="localhost", port=6379, db=10)
 
 def init_experiment_worker():
+	print(_params.broker())
+	print()
 	experiment_app = Celery('experiment_app',
-		broker	= 	'pyamqp://guest@' + '127.0.0.1' + '//',
-		backend	=	'redis://' + '127.0.0.1' + ':6379/2',
-		#broker	= 	'pyamqp://admin:mypass@' + 'rabbit' + '//',
-		#backend	=	'redis://' + 'redis' + ':6379/2',
+		broker	= 	_params.broker() ,
+		backend	=	_params.backend(2),
 		include = ['experiment_manager']
 	)
 

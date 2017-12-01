@@ -3,21 +3,21 @@ from celery import Celery
 from celery.bin import worker
 import time, sys
 from threading import Thread
+import container_feeder, config.parameters as _params
+import experiment_operations, experiment_receiver
 
 node_id = "id_1"
 jqueue_name 	= 'jqueuing_queue'
 
 def init_jqueuing_worker():
 	jqueuing_app = Celery('jqueuing_app',
-		broker	= 	'pyamqp://guest@' + '127.0.0.1' + '//',
-		backend	=	'redis://' + '127.0.0.1' + ':6379/0',
-		#broker	= 	'pyamqp://admin:mypass@' + 'rabbit' + '//',
-		#backend	=	'redis://' + 'redis' + ':6379/0',
-		include	=	['container_operations'])
+		broker	= 	_params.broker() ,
+		backend	=	_params.backend(0),
+		include	=	['experiment_operations'])
 
 	jqueuing_app.conf.update(
 		task_routes = {
-			'container_operations.add': {'queue': jqueue_name},
+			'experiment_operations.add': {'queue': jqueue_name},
 		},
 		task_default_queue = 'jqueuing_default_queue',
 		result_expires=3600,
@@ -46,4 +46,9 @@ def start_jqueuing_worker(worker):
 	jqueuing_worker.run(**jqueuing_options)
 
 if __name__ == '__main__':
-	start_jqueuing_worker(worker)
+	worker_thread = Thread(target = start_jqueuing_worker, args = (worker,))
+	worker_thread.start()
+	experiment_receiver_thread = Thread(target = experiment_receiver.start, args = ())
+	experiment_receiver_thread.start()
+	container_feeder_thread = Thread(target = container_feeder.start, args = (node_id,))
+	container_feeder_thread.start()
