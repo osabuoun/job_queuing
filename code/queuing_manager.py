@@ -4,7 +4,7 @@ from celery.bin import worker
 import time, sys
 from threading import Thread
 import container_feeder, config.parameters as _params
-import experiment_operations, experiment_receiver
+import job_operations
 
 node_id = "id_1"
 jqueue_name 	= 'jqueuing_queue'
@@ -48,7 +48,5 @@ def start_jqueuing_worker(worker):
 if __name__ == '__main__':
 	worker_thread = Thread(target = start_jqueuing_worker, args = (worker,))
 	worker_thread.start()
-	experiment_receiver_thread = Thread(target = experiment_receiver.start, args = ())
-	experiment_receiver_thread.start()
 	container_feeder_thread = Thread(target = container_feeder.start, args = (node_id,))
 	container_feeder_thread.start()

@@ -4,8 +4,6 @@ ADD job_operations.py /app/job_operations.py
 ADD jqueuing_worker.py /app/jqueuing_worker.py
 ADD container_feeder.py /container_feeder/container_feeder.py
 ADD container_operations.py /app/container_operations.py
-ADD experiment_operations.py /app/experiment_operations.py
-ADD experiment_receiver.py /app/experiment_receiver.py
 ADD monitoring.py /app/monitoring.py
 ADD queuing_manager.py /app/queuing_manager.py
 WORKDIR /app/

@@ -4,11 +4,10 @@ from celery.bin import worker
 from threading import Thread
 
 import time, sys, ast
-
-job_queue_name 	= 'job_queue'
+from config.parameters import JOB_QUEUE_PREFIX
 worker_name = "NoName"
 
-def init():
+def init(service_name):
 	job_app = Celery('job_app',
 		broker	= 	'pyamqp://guest@' + '127.0.0.1' + '//',
 		backend	=	'redis://' + '127.0.0.1' + ':6379/1',
@@ -18,21 +17,21 @@ def init():
 
 	job_app.conf.update(
 		task_routes = {
-			'job_operations.add': {'queue': job_queue_name},
+			'job_operations.add': {'queue': JOB_QUEUE_PREFIX + service_name},
 		},
-		task_default_queue = 'job_default_queue',
+		task_default_queue = 'job_default_queue' + "_" + service_name,
 		result_expires=3600,
 		task_serializer = 'json',
 		accept_content = ['json'],
 		worker_concurrency = 1,
 		worker_prefetch_multiplier = 1,
 		task_acks_late = True,
-		task_default_exchange = 'job_exchange',
-		task_default_routing_key = 'job_routing_key' ,
+		task_default_exchange = 'job_exchange' + "_" + service_name,
+		task_default_routing_key = 'job_routing_key' + "_" + service_name,
 	)
 	return job_app
 
-job_app = init()
+job_app = init("")
 node_id = "no_id"
 #def start(container):
 if __name__ == '__main__':
@@ -46,11 +45,11 @@ if __name__ == '__main__':
 		myfile.write("=====================================================\n")
 	worker_id = node_id + "##" + container['service_name'] + "##" + container['id_long']
 
-	job_app = init()
+	job_app = init(container['service_name'])
 	job_worker = worker.worker(app=job_app)
 	job_options = {
 		'hostname'	: worker_id ,
-		'queues'	: [job_queue_name],
+		'queues'	: [JOB_QUEUE_PREFIX + container['service_name']],
 		'loglevel': 'INFO',
 		'traceback': True,
 

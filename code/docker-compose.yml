@@ -60,16 +60,16 @@ services:
             - redis
         ports:
             - "5599:5599"
-        expose:
-            - 8777
 
-    experiment_feeder:
+    experiment_manager:
         build:
             context: .
-            dockerfile: Dockerfile_EFeeder
+            dockerfile: Dockerfile_ExpManager
         volumes:
-            - .:/efeeder
+            - .:/experiment_manager
         links:
-            - queuing_manager
+            - redis
         depends_on:
-            - queuing_manager
+            - redis
+        expose:
+            - 8777

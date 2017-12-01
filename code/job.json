@@ -1,0 +1,15 @@
+{ 
+	"id"		: "job_id_1" ,
+	"service_name":"customer_app1",
+	"params"	: [],
+	"command" 	: [] ,
+	"tasks"		: [
+		{
+			"task1": {
+				"id"		: "task_id_1" ,
+				"command"	: ["python3","app.py"],
+				"params"	: {"id":"id_1", "data":["127.0.0.254"]}
+			}
+		}
+	]
+}

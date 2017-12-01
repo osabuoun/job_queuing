@@ -1,12 +1,12 @@
 import redis 
-
-broker_protocol	= 	'pyamqp'
-broker_username = 	'guest'
-#broker_username = 	'admin'
-broker_password = 	''
-#broker_password = 	'mypass'
-broker_server	=	'127.0.0.1'
-#broker_server	=	'rabbit'
+JOB_QUEUE_PREFIX 	= 	'jqueue_service_'
+broker_protocol		= 	'pyamqp'
+broker_username 	= 	'guest'
+#broker_username 	= 	'admin'
+broker_password 	= 	''
+#broker_password 	= 	'mypass'
+broker_server		=	'127.0.0.1'
+#broker_server		=	'rabbit'
 
 def broker():
 	broker 	= 	broker_protocol + '://' + broker_username 

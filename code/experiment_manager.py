@@ -1,68 +1,59 @@
-from __future__ import absolute_import, unicode_literals
-from celery import Celery
-from celery.bin import worker
-import time, sys
-from threading import Thread
-import container_feeder, config.parameters as _params
-experiment_queue 	= 'experiment_queue'
-customer_services = {}
+from http.server import BaseHTTPRequestHandler, HTTPServer
+import urllib.parse, json, time, ast, random
+from pprint import pprint
 
-import redis
-redis_db = redis.StrictRedis(host="localhost", port=6379, db=10)
+import experiment_operations
 
-def init_experiment_worker():
-	print(_params.broker())
-	print()
-	experiment_app = Celery('experiment_app',
-		broker	= 	_params.broker() ,
-		backend	=	_params.backend(2),
-		include = ['experiment_manager']
-	)
+class HTTP(BaseHTTPRequestHandler):
+    def _set_headers(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
 
-	experiment_app.conf.update(
-		task_routes = {
-			'experiment_manager.add': {'queue': experiment_queue},
-		},
-		task_default_queue = 'experiment_default_queue',
-		result_expires=3600,
-		task_serializer = 'json',
-		accept_content = ['json'],
-		worker_concurrency = 1,
-		worker_prefetch_multiplier = 1,
-		task_acks_late = True,
-		task_default_exchange = 'experiment_exchange',
-		task_default_routing_key = 'experiment_routing_key' ,
-	)
-	return experiment_app
+    def do_HEAD(self):
+        self._set_headers()
+        
+    def do_POST(self):
+        #pprint(vars(self))
+        # Doesn't do anything with posted data
+        content_length= None
+        data_json = None
+        try:
+            content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
+            data = self.rfile.read(int(content_length)).decode('utf-8')
+            data_json = ast.literal_eval(data)
+            print(data_json['service_name'])
+            pass
+        except Exception as e:
+            print("Error in parsing the content_length and packet data")
+        data_back = ""
 
-experiment_app = init_experiment_worker()
+        if (self.path == '/experiment/add'):
+            print(str(data_json))
+            data_back = experiment_operations.add_experiment(data_json)
+            print("------------------/experiment/add---------------")
+        elif (self.path == '/experiment/del'):
+            print(str(data_json))
+            data_back = experiment_operations.del_experiment(data_json)
+            print("------------------/experiment/del---------------")
+        
+        self._set_headers()
+        self.wfile.write(bytes(str(data_back), "utf-8"))
 
-@experiment_app.task(bind=True)
-def add(self, experiment_id, customer_service_name, experiment_params):
-	print("**************************************" )
-	redis_db.set(customer_service_name, {'experiment_id':experiment_id, 'experiment_params':experiment_params})
-	#customer_services[customer_service_name] = {'experiment_id':experiment_id, 'experiment_params':experiment_params}
-	print("A new experiment has just been added")
-	print(str(experiment_id))
-	print(str(customer_service_name))
-	print(str(experiment_params))
-	print("**************************************")
-	print(str(customer_services))
 
-def start_experiment_worker(worker):
-	print("I'm starting the Experiment Worker")
-	experiment_app = init_experiment_worker()
-	experiment_worker = worker.worker(app=experiment_app)
-	experiment_options = {
-		'hostname'	: "experiment_manager",
-		'queues'	: [experiment_queue],
-		'loglevel': 'INFO',
-		'traceback': True,
-	}
-	experiment_worker.run(**experiment_options)
+def start(port=8777):
+    server_address = ('', port)
+    httpd = HTTPServer(server_address, HTTP)
+    print('Starting httpd...' + str(port))
+    
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print("*************************************")
+        pass
+
+    httpd.server_close()
+    print(time.asctime(), "Server Stops - %s:%s" % (server_address, port))
 
 if __name__ == '__main__':
-	experiment_worker_thread = Thread(target = start_experiment_worker, args = (worker,))
-	experiment_worker_thread.start()
-	container_feeder_thread = Thread(target = container_feeder.start, args = (worker,))
-	container_feeder_thread.start()
+    start()
