@@ -45,7 +45,7 @@ def start(node_id_t):
 					print("Container isn't running")
 					continue
 				if (not backend_experiment_db.exists(container_service_name)):
-					print("Container " + container_long_id + " belongs to non-watched service")
+					#print("Container " + container_long_id + " belongs to non-watched service")
 					continue
 				experiment = ast.literal_eval(backend_experiment_db.get(container_service_name))
 				#print("Container " + container_long_id + " belongs to a watched service")
@@ -63,14 +63,14 @@ def start(node_id_t):
 					'ip_address': '',
 					'created': container.attrs['Created'],
 					'started': container.attrs['State']['StartedAt'],
-					'experiment_id':experiment['id'], 
-					'experiment_params':experiment['params'], 
+					'experiment_id':experiment['experiment_id'], 
+					'experiment_params':experiment['experiment_params'], 
 				}
 				try:
 					container_obj['ip_address'] = container.attrs['NetworkSettings']['Networks']['bridge']['IPAddress']
 					add(container_obj)
 					container_list[container_long_id] = container_obj
-					pprint(container_obj)
+					#pprint(container_obj)
 				except Exception as e:
 					print("An error happened while sending the container to the Agent")
 					pass
